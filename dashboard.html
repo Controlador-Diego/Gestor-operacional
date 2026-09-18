@@ -3,352 +3,351 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Controle de O.S. e Abastecimento</title>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <title>Dashboard de Abastecimento & Frota</title>
+  
+  <!-- CDNs (Bootstrap 5, Chart.js, Chart.js DataLabels Plugin, FontAwesome) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
     :root {
-      --bg: #0f172a; --card-bg: #1e293b; --primary: #f8fafc; --secondary: #94a3b8;
-      --accent: #3b82f6; --accent-hover: #2563eb; --border: #334155;
-      --status-success: #4ade80; --status-pending: #fbbf24; --status-error: #f87171;
+      --primary: #1e293b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
     }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--primary); margin: 0; padding: 20px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-    h1 { margin: 0; color: var(--primary); font-size: 24px; font-weight: 600; }
-    .filters { display: flex; gap: 15px; background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
-    .filter-group { display: flex; flex-direction: column; gap: 5px; }
-    label { font-size: 12px; font-weight: bold; color: var(--secondary); }
-    select, button { padding: 8px 12px; background-color: #0f172a; color: var(--primary); border: 1px solid var(--border); border-radius: 6px; outline: none; font-size: 14px; }
-    select:focus { border-color: var(--accent); }
-    button { background-color: var(--accent); color: #ffffff; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    button:hover { background-color: var(--accent-hover); }
-    button:disabled { background-color: var(--secondary); cursor: not-allowed; }
-    .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .kpi { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
-    .kpi-title { font-size: 13px; color: var(--secondary); margin-bottom: 5px; }
-    .kpi-value { font-size: 22px; font-weight: bold; color: var(--primary); }
-    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 20px; }
-    .chart-card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); min-height: 320px; }
-    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-    .chart-header h3 { margin: 0; font-size: 16px; color: var(--primary); }
-    .chart-div { width: 100%; height: 260px; }
-    .table-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-    th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); color: var(--primary); }
-    th { background-color: #0f172a; font-weight: 600; color: var(--secondary); position: sticky; top: 0; }
-    tr:hover { background-color: #334155; }
-    .status-msg { font-size: 13px; font-weight: bold; padding: 8px 12px; border-radius: 6px; background: rgba(0,0,0,0.2); }
-    .error-box { background-color: rgba(248, 113, 113, 0.1); border: 1px solid var(--status-error); color: var(--status-error); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
-    .error-box strong { display: block; margin-bottom: 5px; }
-    .error-box code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+
+    body { background-color: var(--bg); color: #334155; padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif; }
+    header h1 { font-size: 24px; color: var(--primary); font-weight: 700; }
+
+    /* Cards KPI */
+    .kpi-card { background: var(--card-bg); padding: 18px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .kpi-card h3 { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 5px; }
+    .kpi-card .val { font-size: 20px; font-weight: bold; color: var(--primary); }
+
+    /* Painel de Filtros */
+    .filter-card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; }
+
+    /* Gráficos e Tabela */
+    .chart-card, .table-card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .chart-card h2 { font-size: 16px; color: var(--primary); margin-bottom: 15px; font-weight: 600; }
+    
+    table { font-size: 13px; }
+    th { background-color: #f1f5f9 !important; color: #475569; }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>Dashboard de Abastecimento</h1>
-    <span class="status-msg" id="statusMsg">Inicializando...</span>
-  </div>
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fa-solid fa-truck-monster text-primary me-2"></i> Dashboard de Abastecimento & Frota</h1>
+  </header>
 
-  <div id="errorBox" class="error-box">
-    <strong>⚠ Problema de Conexão com os Dados:</strong>
-    <span id="errorDetails"></span>
-  </div>
+  <!-- Painel de Filtros -->
+  <div class="filter-card">
+    <div class="row g-3">
+      <!-- Filtro por Placa -->
+      <div class="col-md-3">
+        <label for="filtroPlaca" class="form-label fw-semibold text-secondary small">Placa</label>
+        <select id="filtroPlaca" class="form-select" onchange="aplicarFiltros()">
+          <option value="">Todas as Placas</option>
+        </select>
+      </div>
 
-  <div class="filters">
-    <div class="filter-group">
-      <label for="filtroVeiculo">Placa / Veículo</label>
-      <select id="filtroVeiculo" onchange="aplicarFiltros()"><option value="TODOS">Todas as Placas</option></select>
+      <!-- Filtro por Colaborador -->
+      <div class="col-md-3">
+        <label for="filtroColaborador" class="form-label fw-semibold text-secondary small">Colaborador</label>
+        <select id="filtroColaborador" class="form-select" onchange="aplicarFiltros()">
+          <option value="">Todos os Colaboradores</option>
+        </select>
+      </div>
+
+      <!-- Filtro por Data -->
+      <div class="col-md-3">
+        <label for="filtroData" class="form-label fw-semibold text-secondary small">Data</label>
+        <input type="date" id="filtroData" class="form-control" onchange="aplicarFiltros()">
+      </div>
+
+      <!-- Filtro por Combustível -->
+      <div class="col-md-3">
+        <label for="filtroCombustivel" class="form-label fw-semibold text-secondary small">Combustível</label>
+        <select id="filtroCombustivel" class="form-select" onchange="aplicarFiltros()">
+          <option value="">Todos os Combustíveis</option>
+        </select>
+      </div>
     </div>
-    <div class="filter-group">
-      <label for="filtroColaborador">Colaborador</label>
-      <select id="filtroColaborador" onchange="aplicarFiltros()"><option value="TODOS">Todos os Colaboradores</option></select>
-    </div>
-    <button id="btnAtualizar" onclick="carregarDadosAPI()">🔄 Atualizar Dados</button>
   </div>
 
-  <div class="kpi-container">
-    <div class="kpi"><div class="kpi-title">Valor Total (R$)</div><div class="kpi-value" id="kpiValorTotal">R$ 0,00</div></div>
-    <div class="kpi"><div class="kpi-title">Total KM Percorrido</div><div class="kpi-value" id="kpiKmTotal">0 km</div></div>
-    <div class="kpi"><div class="kpi-title">Média R$/KM</div><div class="kpi-value" id="kpiRsKmMedio">R$ 0,00</div></div>
+  <div id="loading-state" class="text-center my-5 text-secondary">
+    <i class="fa-solid fa-spinner fa-spin fa-2x mb-2"></i>
+    <div>Carregando dados da planilha...</div>
   </div>
 
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-header">
-        <h3>Análise por Placa</h3>
-        <div class="filter-group">
-          <label for="metricaGrafico">Métrica:</label>
-          <select id="metricaGrafico" onchange="atualizarGraficoMetrica()">
-            <option value="valor">Soma Valor Total (R$)</option>
-            <option value="rskm">Média R$/KM</option>
-          </select>
+  <div id="dashboard-content" style="display: none;">
+    <!-- Indicadores KPI -->
+    <div class="row g-3 mb-4">
+      <div class="col-md">
+        <div class="kpi-card">
+          <h3>Total Gasto</h3>
+          <div class="val" id="kpi-gasto">R$ 0,00</div>
         </div>
       </div>
-      <div id="chartPlacas" class="chart-div"></div>
+      <div class="col-md">
+        <div class="kpi-card">
+          <h3>Total de Litros</h3>
+          <div class="val" id="kpi-litros">0 L</div>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="kpi-card">
+          <h3>KM Percorrido</h3>
+          <div class="val" id="kpi-km">0 KM</div>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="kpi-card">
+          <h3>Média Geral (KM/L)</h3>
+          <div class="val" id="kpi-media">0,00</div>
+        </div>
+      </div>
+      <div class="col-md">
+        <div class="kpi-card">
+          <h3>Média (R$/KM)</h3>
+          <div class="val" id="kpi-rskm">R$ 0,00</div>
+        </div>
+      </div>
     </div>
-    <div class="chart-card">
-      <div class="chart-header"><h3>Eficiência R$/KM por Colaborador</h3></div>
-      <div id="chartColaboradores" class="chart-div"></div>
-    </div>
-  </div>
 
-  <div class="table-container">
-    <table id="tabelaResumo">
-      <thead>
-        <tr><th>Placa</th><th>Veículo</th><th>Colaborador</th><th>Total Reg.</th><th>KM Percorrido</th><th>Valor Total (R$)</th><th>R$/KM Médio</th></tr>
-      </thead>
-      <tbody><tr><td colspan="7" style="text-align: center; color: var(--secondary);">Aguardando dados...</td></tr></tbody>
-    </table>
+    <!-- Gráficos -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h2>Gasto Total por Placa (R$)</h2>
+          <canvas id="chartGastoPlaca"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h2>Média R$/KM por Placa</h2>
+          <canvas id="chartMediaRsKm"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela de Dados -->
+    <div class="table-card table-responsive">
+      <table class="table table-hover align-middle mb-0" id="data-table">
+        <thead><tr id="table-headers"></tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFQY83uwebAq57HUjSj0OaMPNfa_jNlwEsHKQMf1XEvz9NamROSUFon4ND2TR4w7f_QQ/exec';
+    // Registrar o plugin de labels de texto nos gráficos
+    Chart.register(ChartDataLabels);
+
+    // INSIRA AQUI A URL DE IMPLANTAÇÃO DO SEU GOOGLE APPS SCRIPT COMO WEB APP:
+    const API_URL = "SUA_URL_DO_WEB_APP_AQUI";
 
     let dadosBrutos = [];
-    let dadosFiltradosAtuais = [];
-    let agrupadoAtual = {};
-    let googleChartsLoaded = false;
+    let dadosFiltrados = [];
+    let chartBarras, chartRosca;
 
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(() => {
-      googleChartsLoaded = true;
-      carregarDadosAPI();
-    });
-
-    function mostrarMensagem(texto, cor) {
-      const msg = document.getElementById('statusMsg');
-      msg.innerText = texto;
-      msg.style.color = cor;
-    }
-
-    function mostrarErroCritico(detalhes) {
-      document.getElementById('errorBox').style.display = 'block';
-      document.getElementById('errorDetails').innerHTML = detalhes;
-      mostrarMensagem("⚠ Falha na leitura dos dados", "var(--status-error)");
-    }
-
-    function parseNumber(val) {
-      if (val === null || val === undefined || val === '') return 0;
-      if (typeof val === 'number') return val;
-      let clean = val.toString().replace(/R\$/g, '').replace(/\s/g, '').trim();
-      if (clean.includes(',') && clean.includes('.')) {
-        clean = clean.replace(/\./g, '').replace(',', '.');
-      } else if (clean.includes(',')) {
-        clean = clean.replace(',', '.');
+    window.onload = function() {
+      if (API_URL === "SUA_URL_DO_WEB_APP_AQUI") {
+        alert("Atenção: Subsitua 'SUA_URL_DO_WEB_APP_AQUI' no script pela URL de Implantação do seu Apps Script.");
       }
-      return parseFloat(clean) || 0;
-    }
 
-    function fmtBRL(val) {
-      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
+      fetch(API_URL)
+        .then(resposta => {
+          if (!resposta.ok) throw new Error("Erro na requisição: " + resposta.statusText);
+          return resposta.json();
+        })
+        .then(dados => inicializarDashboard(dados))
+        .catch(erro => {
+          console.error(erro);
+          document.getElementById('loading-state').innerHTML = `<div class="text-danger"><i class="fa-solid fa-triangle-exclamation mb-2 fa-2x"></i><br>Erro ao carregar dados da planilha.</div>`;
+        });
+    };
 
-    function getColuna(item, nomesPossiveis) {
-      for (let nomeBusca of nomesPossiveis) {
-        let nomeBuscaNorm = nomeBusca.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        for (let chave in item) {
-          let chaveNorm = chave.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          if (chaveNorm === nomeBuscaNorm) {
-            return item[chave];
-          }
-        }
-      }
-      return "";
-    }
-
-    function processarDadosAPI(data) {
-      if (data && typeof data === 'object' && data.error) {
-        mostrarErroCritico(`Erro no Apps Script: <code>${data.error}</code>`);
+    function inicializarDashboard(dados) {
+      if (!dados || dados.length === 0) {
+        document.getElementById('loading-state').innerText = "Nenhum dado encontrado na planilha.";
         return;
       }
 
-      if (!data || !Array.isArray(data) || data.length === 0) {
-        mostrarErroCritico("A planilha está vazia ou o Apps Script não retornou dados.");
-        return;
-      }
+      dadosBrutos = dados;
+      dadosFiltrados = [...dados];
 
-      const firstRowKeys = Object.keys(data[0]);
-      if (firstRowKeys.length <= 2 && (firstRowKeys[0].toUpperCase().includes('RELATÓRIO') || firstRowKeys[0] === "")) {
-        mostrarErroCritico(`
-          O Apps Script ainda está lendo a aba errada.<br>
-          <strong>Ação necessária:</strong> Atualize a implantação do Google Apps Script para a <u>Nova versão</u>.
-        `);
-        return;
-      }
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('dashboard-content').style.display = 'block';
 
-      dadosBrutos = data;
-      mostrarMensagem(`✓ Conectado com sucesso! (${dadosBrutos.length} registros)`, "var(--status-success)");
-      document.getElementById('errorBox').style.display = 'none';
-      
-      popularFiltros();
+      popularOpcoesFiltros();
       aplicarFiltros();
     }
 
-    function carregarDadosAPI() {
-      mostrarMensagem("Carregando dados...", "var(--status-pending)");
-      document.getElementById('btnAtualizar').disabled = true;
+    function popularOpcoesFiltros() {
+      const selectPlaca = document.getElementById('filtroPlaca');
+      const selectColab = document.getElementById('filtroColaborador');
+      const selectComb = document.getElementById('filtroCombustivel');
 
-      const oldScript = document.getElementById('jsonpScript');
-      if (oldScript) oldScript.remove();
+      const placas = [...new Set(dadosBrutos.map(d => d['Placa']).filter(Boolean))].sort();
+      const colaboradores = [...new Set(dadosBrutos.map(d => d['Nome Colaborador']).filter(Boolean))].sort();
+      const combustiveis = [...new Set(dadosBrutos.map(d => d['Combustível']).filter(Boolean))].sort();
 
-      const script = document.createElement('script');
-      script.id = 'jsonpScript';
-      script.src = SCRIPT_URL + '?callback=processarDadosAPI&t=' + new Date().getTime();
-      
-      script.onload = () => { document.getElementById('btnAtualizar').disabled = false; };
-      script.onerror = () => {
-        mostrarErroCritico("Falha de rede. Verifique a URL do Apps Script.");
-        document.getElementById('btnAtualizar').disabled = false;
-      };
-      document.body.appendChild(script);
-    }
-
-    function popularFiltros() {
-      const placas = new Set();
-      const colaboradores = new Set();
-
-      dadosBrutos.forEach(item => {
-        const placa = getColuna(item, ["Placa"]);
-        const colab = getColuna(item, ["Nome Colaborador", "Colaborador", "Motorista"]);
-        if (placa && placa.toString().trim() !== '') placas.add(placa.toString().trim());
-        if (colab && colab.toString().trim() !== '') colaboradores.add(colab.toString().trim());
-      });
-
-      const selVeiculo = document.getElementById('filtroVeiculo');
-      const selColab = document.getElementById('filtroColaborador');
-      const pSelAtual = selVeiculo.value;
-      const cSelAtual = selColab.value;
-
-      selVeiculo.innerHTML = '<option value="TODOS">Todas as Placas</option>';
-      selColab.innerHTML = '<option value="TODOS">Todos os Colaboradores</option>';
-
-      Array.from(placas).sort().forEach(p => { selVeiculo.innerHTML += `<option value="${p}">${p}</option>`; });
-      Array.from(colaboradores).sort().forEach(c => { selColab.innerHTML += `<option value="${c}">${c}</option>`; });
-
-      if (pSelAtual !== 'TODOS' && Array.from(placas).includes(pSelAtual)) selVeiculo.value = pSelAtual;
-      if (cSelAtual !== 'TODOS' && Array.from(colaboradores).includes(cSelAtual)) selColab.value = cSelAtual;
+      placas.forEach(p => selectPlaca.add(new Option(p, p)));
+      colaboradores.forEach(c => selectColab.add(new Option(c, c)));
+      combustiveis.forEach(cb => selectComb.add(new Option(cb, cb)));
     }
 
     function aplicarFiltros() {
-      const pSel = document.getElementById('filtroVeiculo').value;
-      const cSel = document.getElementById('filtroColaborador').value;
+      const placa = document.getElementById('filtroPlaca').value;
+      const colaborador = document.getElementById('filtroColaborador').value;
+      const dataFiltro = document.getElementById('filtroData').value;
+      const combustivel = document.getElementById('filtroCombustivel').value;
 
-      dadosFiltradosAtuais = dadosBrutos.filter(item => {
-        const placa = getColuna(item, ["Placa"]).toString().trim();
-        const colab = getColuna(item, ["Nome Colaborador", "Colaborador", "Motorista"]).toString().trim();
-        return (pSel === 'TODOS' || placa === pSel) && (cSel === 'TODOS' || colab === cSel);
+      let dataFormatada = "";
+      if (dataFiltro) {
+        const partes = dataFiltro.split('-');
+        dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+
+      dadosFiltrados = dadosBrutos.filter(item => {
+        const matchPlaca = !placa || item['Placa'] === placa;
+        const matchColab = !colaborador || item['Nome Colaborador'] === colaborador;
+        const matchData = !dataFormatada || item['Data'] === dataFormatada;
+        const matchComb = !combustivel || item['Combustível'] === combustivel;
+
+        return matchPlaca && matchColab && matchData && matchComb;
       });
 
-      renderizarDashboard(dadosFiltradosAtuais);
+      atualizarKPIs();
+      renderizarGraficos();
+      renderizarTabela();
     }
 
-    function renderizarDashboard(dados) {
-      let valorTotal = 0;
-      let kmTotal = 0;
-      agrupadoAtual = {};
+    function atualizarKPIs() {
+      let totalGasto = 0, totalLitros = 0, totalKM = 0, somaRskm = 0, qtdRskm = 0;
 
-      dados.forEach(item => {
-        const placa = getColuna(item, ["Placa"]) || "SEM PLACA";
-        const veiculo = getColuna(item, ["Veículo", "Veiculo", "Modelo"]) || "-";
-        const colab = getColuna(item, ["Nome Colaborador", "Colaborador", "Motorista"]) || "SEM NOME";
+      dadosFiltrados.forEach(item => {
+        totalGasto += parseFloat(item['Valor R$']) || 0;
+        totalLitros += parseFloat(item['Qtd. Litros']) || 0;
+        totalKM += parseFloat(item['KM Percorrido']) || 0;
         
-        const v = parseNumber(getColuna(item, ["Valor R$", "Valor Total", "Valor"]));
-        const km = parseNumber(getColuna(item, ["KM Percorrido", "KM", "Km Rodado"]));
-
-        valorTotal += v;
-        kmTotal += km;
-
-        const chave = `${placa} | ${colab}`;
-        if (!agrupadoAtual[chave]) {
-          agrupadoAtual[chave] = { placa, veiculo, colab, totalOS: 0, km: 0, valor: 0 };
+        const rskmVal = parseFloat(item['R$/KM']) || 0;
+        if (rskmVal > 0) {
+          somaRskm += rskmVal;
+          qtdRskm++;
         }
-        agrupadoAtual[chave].totalOS += 1;
-        agrupadoAtual[chave].km += km;
-        agrupadoAtual[chave].valor += v;
       });
 
-      document.getElementById('kpiValorTotal').innerText = fmtBRL(valorTotal);
-      document.getElementById('kpiKmTotal').innerText = `${kmTotal.toLocaleString('pt-BR')} km`;
-      const rsKmMedioGlobal = kmTotal > 0 ? (valorTotal / kmTotal) : 0;
-      document.getElementById('kpiRsKmMedio').innerText = fmtBRL(rsKmMedioGlobal) + ' / km';
+      const mediaGeralKmL = totalLitros > 0 ? (totalKM / totalLitros) : 0;
+      const mediaGeralRsKm = qtdRskm > 0 ? (somaRskm / qtdRskm) : 0;
 
-      const tbody = document.querySelector('#tabelaResumo tbody');
-      tbody.innerHTML = '';
+      document.getElementById('kpi-gasto').innerText = totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      document.getElementById('kpi-litros').innerText = totalLitros.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' L';
+      document.getElementById('kpi-km').innerText = totalKM.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' KM';
+      document.getElementById('kpi-media').innerText = mediaGeralKmL.toFixed(2) + ' KM/L';
+      document.getElementById('kpi-rskm').innerText = mediaGeralRsKm.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
 
-      const valoresAgrupados = Object.values(agrupadoAtual);
-      if (valoresAgrupados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--secondary);">Nenhum registro encontrado.</td></tr>';
-      } else {
-        valoresAgrupados.forEach(g => {
-          const rskm = g.km > 0 ? (g.valor / g.km) : 0;
-          tbody.innerHTML += `
-            <tr>
-              <td><b>${g.placa}</b></td><td>${g.veiculo}</td><td>${g.colab}</td>
-              <td>${g.totalOS}</td><td>${g.km.toLocaleString('pt-BR')} km</td>
-              <td>${fmtBRL(g.valor)}</td><td>${fmtBRL(rskm)}</td>
-            </tr>`;
+    function renderizarGraficos() {
+      const gastoPorPlaca = {};
+      const somaRskmPorPlaca = {};
+      const contagemPorPlaca = {};
+
+      dadosFiltrados.forEach(item => {
+        const placa = item['Placa'] || 'Sem Placa';
+        const valor = parseFloat(item['Valor R$']) || 0;
+        const rskm = parseFloat(item['R$/KM']) || 0;
+
+        gastoPorPlaca[placa] = (gastoPorPlaca[placa] || 0) + valor;
+
+        if (rskm > 0) {
+          somaRskmPorPlaca[placa] = (somaRskmPorPlaca[placa] || 0) + rskm;
+          contagemPorPlaca[placa] = (contagemPorPlaca[placa] || 0) + 1;
+        }
+      });
+
+      const labelsPlacaRosca = Object.keys(somaRskmPorPlaca);
+      const mediaRskm = labelsPlacaRosca.map(placa => {
+        return (somaRskmPorPlaca[placa] / contagemPorPlaca[placa]).toFixed(2);
+      });
+
+      // Gráfico de Barras
+      if (chartBarras) chartBarras.destroy();
+      chartBarras = new Chart(document.getElementById('chartGastoPlaca'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(gastoPorPlaca),
+          datasets: [{
+            label: 'Gasto Total (R$)',
+            data: Object.values(gastoPorPlaca),
+            backgroundColor: '#2563eb'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            datalabels: { display: false }
+          }
+        }
+      });
+
+      // Gráfico de Rosca com EXIBIÇÃO DE VALOR
+      if (chartRosca) chartRosca.destroy();
+      chartRosca = new Chart(document.getElementById('chartMediaRsKm'), {
+        type: 'doughnut',
+        data: {
+          labels: labelsPlacaRosca,
+          datasets: [{
+            label: 'Média R$/KM',
+            data: mediaRskm,
+            backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            datalabels: {
+              color: '#ffffff',
+              font: { weight: 'bold', size: 12 },
+              formatter: (value) => 'R$ ' + value
+            }
+          }
+        }
+      });
+    }
+
+    function renderizarTabela() {
+      const headersRow = document.getElementById('table-headers');
+      const body = document.getElementById('table-body');
+
+      headersRow.innerHTML = '';
+      body.innerHTML = '';
+
+      if (dadosFiltrados.length === 0) return;
+
+      const colunas = Object.keys(dadosFiltrados[0]);
+      colunas.forEach(col => {
+        const th = document.createElement('th');
+        th.innerText = col;
+        headersRow.appendChild(th);
+      });
+
+      dadosFiltrados.forEach(linha => {
+        const tr = document.createElement('tr');
+        colunas.forEach(col => {
+          const td = document.createElement('td');
+          td.innerText = linha[col] !== undefined ? linha[col] : '';
+          tr.appendChild(td);
         });
-      }
-
-      if (googleChartsLoaded) {
-        atualizarGraficoMetrica();
-        renderizarGraficoColaboradores();
-      }
+        body.appendChild(tr);
+      });
     }
-
-    function atualizarGraficoMetrica() {
-      if (!googleChartsLoaded || Object.keys(agrupadoAtual).length === 0) return;
-      const metrica = document.getElementById('metricaGrafico').value;
-      let porPlaca = {};
-      
-      Object.values(agrupadoAtual).forEach(item => {
-        if (!porPlaca[item.placa]) porPlaca[item.placa] = { valor: 0, km: 0 };
-        porPlaca[item.placa].valor += item.valor;
-        porPlaca[item.placa].km += item.km;
-      });
-
-      const labelTitulo = metrica === 'valor' ? 'Valor Total (R$)' : 'Média R$/KM';
-      const corBarra = metrica === 'valor' ? '#3b82f6' : '#10b981';
-      const chartData = [['Placa', labelTitulo, { role: 'style' }]];
-
-      Object.keys(porPlaca).forEach(placa => {
-        let val = metrica === 'valor' ? porPlaca[placa].valor : (porPlaca[placa].km > 0 ? (porPlaca[placa].valor / porPlaca[placa].km) : 0);
-        chartData.push([placa, val, corBarra]);
-      });
-
-      const dataTable = google.visualization.arrayToDataTable(chartData);
-      const chart = new google.visualization.ColumnChart(document.getElementById('chartPlacas'));
-      chart.draw(dataTable, { backgroundColor: 'transparent', legend: { position: 'none' }, hAxis: { textStyle: { color: '#94a3b8' } }, vAxis: { textStyle: { color: '#94a3b8' }, gridlines: { color: '#334155' } }, chartArea: { width: '80%', height: '75%' }, colors: [corBarra] });
-    }
-
-    function renderizarGraficoColaboradores() {
-      if (!googleChartsLoaded || Object.keys(agrupadoAtual).length === 0) return;
-      let porColab = {};
-      
-      Object.values(agrupadoAtual).forEach(item => {
-        if (!porColab[item.colab]) porColab[item.colab] = { valor: 0, km: 0 };
-        porColab[item.colab].valor += item.valor;
-        porColab[item.colab].km += item.km;
-      });
-
-      const chartData = [['Colaborador', 'Custo R$/KM Médio', { role: 'style' }]];
-      Object.keys(porColab).forEach(colab => {
-        let rskm = porColab[colab].km > 0 ? (porColab[colab].valor / porColab[colab].km) : 0;
-        chartData.push([colab, rskm, '#10b981']);
-      });
-
-      const dataTable = google.visualization.arrayToDataTable(chartData);
-      const chart = new google.visualization.ColumnChart(document.getElementById('chartColaboradores'));
-      chart.draw(dataTable, { backgroundColor: 'transparent', legend: { position: 'none' }, hAxis: { textStyle: { color: '#94a3b8' } }, vAxis: { textStyle: { color: '#94a3b8' }, gridlines: { color: '#334155' } }, chartArea: { width: '80%', height: '75%' }, colors: ['#10b981'] });
-    }
-    
-    window.addEventListener('resize', () => {
-      if (googleChartsLoaded && Object.keys(agrupadoAtual).length > 0) {
-        atualizarGraficoMetrica();
-        renderizarGraficoColaboradores();
-      }
-    });
   </script>
 </body>
 </html>
