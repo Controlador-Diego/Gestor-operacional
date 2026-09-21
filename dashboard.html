@@ -3,351 +3,228 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard de Abastecimento & Frota</title>
-  
-  <!-- CDNs (Bootstrap 5, Chart.js, Chart.js DataLabels Plugin, FontAwesome) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+  <title>Central de Dashboards</title>
   <style>
     :root {
-      --primary: #1e293b;
-      --bg: #f8fafc;
+      --primary-color: #007bff;
+      --bg-color: #f4f6f9;
       --card-bg: #ffffff;
-      --border: #e2e8f0;
+      --text-color: #333333;
     }
 
-    body { background-color: var(--bg); color: #334155; padding: 20px; font-family: 'Segoe UI', system-ui, sans-serif; }
-    header h1 { font-size: 24px; color: var(--primary); font-weight: 700; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    /* Cards KPI */
-    .kpi-card { background: var(--card-bg); padding: 18px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .kpi-card h3 { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 5px; }
-    .kpi-card .val { font-size: 20px; font-weight: bold; color: var(--primary); }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    /* Painel de Filtros */
-    .filter-card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; }
+    /* Cabeçalho / Barra Navegação */
+    header {
+      background: #1e293b;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
 
-    /* Gráficos e Tabela */
-    .chart-card, .table-card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; }
-    .chart-card h2 { font-size: 16px; color: var(--primary); margin-bottom: 15px; font-weight: 600; }
-    
-    table { font-size: 13px; }
-    th { background-color: #f1f5f9 !important; color: #475569; }
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Botões de Navegação (Abas) */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ccc;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* Área Principal dos Dashboards */
+    main {
+      flex: 1;
+      position: relative;
+      background: #e2e8f0;
+      display: flex;
+    }
+
+    .view-container {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .view-container.active {
+      display: flex;
+    }
+
+    /* Container Modo Split (Lado a Lado) */
+    .split-view {
+      flex-direction: row;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .dashboard-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+      background: #f8fafc;
+      padding: 10px 15px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card-header a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .card-header a:hover {
+      text-decoration: underline;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Responsividade para Celulares */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .nav-tabs {
+        justify-content: space-between;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 8px 5px;
+        font-size: 11px;
+        text-align: center;
+      }
+
+      .split-view {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <header class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fa-solid fa-truck-monster text-primary me-2"></i> Dashboard de Abastecimento & Frota</h1>
+  <header>
+    <h1>📊 Central de Gerenciamento</h1>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="mostrarAba('dash1', this)">Painel 1</button>
+      <button class="tab-btn" onclick="mostrarAba('dash2', this)">Painel 2</button>
+      <button class="tab-btn" onclick="mostrarAba('dash-split', this)">⚡ Ambos (Lado a Lado)</button>
+    </div>
   </header>
 
-  <!-- Painel de Filtros -->
-  <div class="filter-card">
-    <div class="row g-3">
-      <!-- Filtro por Placa -->
-      <div class="col-md-3">
-        <label for="filtroPlaca" class="form-label fw-semibold text-secondary small">Placa</label>
-        <select id="filtroPlaca" class="form-select" onchange="aplicarFiltros()">
-          <option value="">Todas as Placas</option>
-        </select>
-      </div>
-
-      <!-- Filtro por Colaborador -->
-      <div class="col-md-3">
-        <label for="filtroColaborador" class="form-label fw-semibold text-secondary small">Colaborador</label>
-        <select id="filtroColaborador" class="form-select" onchange="aplicarFiltros()">
-          <option value="">Todos os Colaboradores</option>
-        </select>
-      </div>
-
-      <!-- Filtro por Data -->
-      <div class="col-md-3">
-        <label for="filtroData" class="form-label fw-semibold text-secondary small">Data</label>
-        <input type="date" id="filtroData" class="form-control" onchange="aplicarFiltros()">
-      </div>
-
-      <!-- Filtro por Combustível -->
-      <div class="col-md-3">
-        <label for="filtroCombustivel" class="form-label fw-semibold text-secondary small">Combustível</label>
-        <select id="filtroCombustivel" class="form-select" onchange="aplicarFiltros()">
-          <option value="">Todos os Combustíveis</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div id="loading-state" class="text-center my-5 text-secondary">
-    <i class="fa-solid fa-spinner fa-spin fa-2x mb-2"></i>
-    <div>Carregando dados da planilha...</div>
-  </div>
-
-  <div id="dashboard-content" style="display: none;">
-    <!-- Indicadores KPI -->
-    <div class="row g-3 mb-4">
-      <div class="col-md">
-        <div class="kpi-card">
-          <h3>Total Gasto</h3>
-          <div class="val" id="kpi-gasto">R$ 0,00</div>
-        </div>
-      </div>
-      <div class="col-md">
-        <div class="kpi-card">
-          <h3>Total de Litros</h3>
-          <div class="val" id="kpi-litros">0 L</div>
-        </div>
-      </div>
-      <div class="col-md">
-        <div class="kpi-card">
-          <h3>KM Percorrido</h3>
-          <div class="val" id="kpi-km">0 KM</div>
-        </div>
-      </div>
-      <div class="col-md">
-        <div class="kpi-card">
-          <h3>Média Geral (KM/L)</h3>
-          <div class="val" id="kpi-media">0,00</div>
-        </div>
-      </div>
-      <div class="col-md">
-        <div class="kpi-card">
-          <h3>Média (R$/KM)</h3>
-          <div class="val" id="kpi-rskm">R$ 0,00</div>
-        </div>
+  <main>
+    <!-- Aba 1: Primeiro Dashboard em Tela Cheia -->
+    <div id="dash1" class="view-container active">
+      <div class="dashboard-card" style="border-radius: 0;">
+        <iframe src="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec"></iframe>
       </div>
     </div>
 
-    <!-- Gráficos -->
-    <div class="row g-3 mb-4">
-      <div class="col-md-6">
-        <div class="chart-card">
-          <h2>Gasto Total por Placa (R$)</h2>
-          <canvas id="chartGastoPlaca"></canvas>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="chart-card">
-          <h2>Média R$/KM por Placa</h2>
-          <canvas id="chartMediaRsKm"></canvas>
-        </div>
+    <!-- Aba 2: Segundo Dashboard em Tela Cheia -->
+    <div id="dash2" class="view-container">
+      <div class="dashboard-card" style="border-radius: 0;">
+        <iframe src="https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec"></iframe>
       </div>
     </div>
 
-    <!-- Tabela de Dados -->
-    <div class="table-card table-responsive">
-      <table class="table table-hover align-middle mb-0" id="data-table">
-        <thead><tr id="table-headers"></tr></thead>
-        <tbody id="table-body"></tbody>
-      </table>
+    <!-- Aba 3: Modo Dividido (Ambos lado a lado) -->
+    <div id="dash-split" class="view-container split-view">
+      <div class="dashboard-card">
+        <div class="card-header">
+          <span>Painel 1</span>
+          <a href="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec" target="_blank">Abrir em nova aba ↗</a>
+        </div>
+        <iframe src="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec"></iframe>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="card-header">
+          <span>Painel 2 (Controle)</span>
+          <a href="https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec" target="_blank">Abrir em nova aba ↗</a>
+        </div>
+        <iframe src="https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec"></iframe>
+      </div>
     </div>
-  </div>
+  </main>
 
   <script>
-    // Registrar o plugin de labels de texto nos gráficos
-    Chart.register(ChartDataLabels);
+    function mostrarAba(idAba, elementoBotao) {
+      // Oculta todas as telas
+      const views = document.querySelectorAll('.view-container');
+      views.forEach(view => view.classList.remove('active'));
 
-    // INSIRA AQUI A URL DE IMPLANTAÇÃO DO SEU GOOGLE APPS SCRIPT COMO WEB APP:
-    const API_URL = "SUA_URL_DO_WEB_APP_AQUI";
+      // Remove a classe 'active' de todos os botões
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
 
-    let dadosBrutos = [];
-    let dadosFiltrados = [];
-    let chartBarras, chartRosca;
-
-    window.onload = function() {
-      if (API_URL === "SUA_URL_DO_WEB_APP_AQUI") {
-        alert("Atenção: Subsitua 'SUA_URL_DO_WEB_APP_AQUI' no script pela URL de Implantação do seu Apps Script.");
-      }
-
-      fetch(API_URL)
-        .then(resposta => {
-          if (!resposta.ok) throw new Error("Erro na requisição: " + resposta.statusText);
-          return resposta.json();
-        })
-        .then(dados => inicializarDashboard(dados))
-        .catch(erro => {
-          console.error(erro);
-          document.getElementById('loading-state').innerHTML = `<div class="text-danger"><i class="fa-solid fa-triangle-exclamation mb-2 fa-2x"></i><br>Erro ao carregar dados da planilha.</div>`;
-        });
-    };
-
-    function inicializarDashboard(dados) {
-      if (!dados || dados.length === 0) {
-        document.getElementById('loading-state').innerText = "Nenhum dado encontrado na planilha.";
-        return;
-      }
-
-      dadosBrutos = dados;
-      dadosFiltrados = [...dados];
-
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('dashboard-content').style.display = 'block';
-
-      popularOpcoesFiltros();
-      aplicarFiltros();
-    }
-
-    function popularOpcoesFiltros() {
-      const selectPlaca = document.getElementById('filtroPlaca');
-      const selectColab = document.getElementById('filtroColaborador');
-      const selectComb = document.getElementById('filtroCombustivel');
-
-      const placas = [...new Set(dadosBrutos.map(d => d['Placa']).filter(Boolean))].sort();
-      const colaboradores = [...new Set(dadosBrutos.map(d => d['Nome Colaborador']).filter(Boolean))].sort();
-      const combustiveis = [...new Set(dadosBrutos.map(d => d['Combustível']).filter(Boolean))].sort();
-
-      placas.forEach(p => selectPlaca.add(new Option(p, p)));
-      colaboradores.forEach(c => selectColab.add(new Option(c, c)));
-      combustiveis.forEach(cb => selectComb.add(new Option(cb, cb)));
-    }
-
-    function aplicarFiltros() {
-      const placa = document.getElementById('filtroPlaca').value;
-      const colaborador = document.getElementById('filtroColaborador').value;
-      const dataFiltro = document.getElementById('filtroData').value;
-      const combustivel = document.getElementById('filtroCombustivel').value;
-
-      let dataFormatada = "";
-      if (dataFiltro) {
-        const partes = dataFiltro.split('-');
-        dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      }
-
-      dadosFiltrados = dadosBrutos.filter(item => {
-        const matchPlaca = !placa || item['Placa'] === placa;
-        const matchColab = !colaborador || item['Nome Colaborador'] === colaborador;
-        const matchData = !dataFormatada || item['Data'] === dataFormatada;
-        const matchComb = !combustivel || item['Combustível'] === combustivel;
-
-        return matchPlaca && matchColab && matchData && matchComb;
-      });
-
-      atualizarKPIs();
-      renderizarGraficos();
-      renderizarTabela();
-    }
-
-    function atualizarKPIs() {
-      let totalGasto = 0, totalLitros = 0, totalKM = 0, somaRskm = 0, qtdRskm = 0;
-
-      dadosFiltrados.forEach(item => {
-        totalGasto += parseFloat(item['Valor R$']) || 0;
-        totalLitros += parseFloat(item['Qtd. Litros']) || 0;
-        totalKM += parseFloat(item['KM Percorrido']) || 0;
-        
-        const rskmVal = parseFloat(item['R$/KM']) || 0;
-        if (rskmVal > 0) {
-          somaRskm += rskmVal;
-          qtdRskm++;
-        }
-      });
-
-      const mediaGeralKmL = totalLitros > 0 ? (totalKM / totalLitros) : 0;
-      const mediaGeralRsKm = qtdRskm > 0 ? (somaRskm / qtdRskm) : 0;
-
-      document.getElementById('kpi-gasto').innerText = totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-      document.getElementById('kpi-litros').innerText = totalLitros.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' L';
-      document.getElementById('kpi-km').innerText = totalKM.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' KM';
-      document.getElementById('kpi-media').innerText = mediaGeralKmL.toFixed(2) + ' KM/L';
-      document.getElementById('kpi-rskm').innerText = mediaGeralRsKm.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
-    function renderizarGraficos() {
-      const gastoPorPlaca = {};
-      const somaRskmPorPlaca = {};
-      const contagemPorPlaca = {};
-
-      dadosFiltrados.forEach(item => {
-        const placa = item['Placa'] || 'Sem Placa';
-        const valor = parseFloat(item['Valor R$']) || 0;
-        const rskm = parseFloat(item['R$/KM']) || 0;
-
-        gastoPorPlaca[placa] = (gastoPorPlaca[placa] || 0) + valor;
-
-        if (rskm > 0) {
-          somaRskmPorPlaca[placa] = (somaRskmPorPlaca[placa] || 0) + rskm;
-          contagemPorPlaca[placa] = (contagemPorPlaca[placa] || 0) + 1;
-        }
-      });
-
-      const labelsPlacaRosca = Object.keys(somaRskmPorPlaca);
-      const mediaRskm = labelsPlacaRosca.map(placa => {
-        return (somaRskmPorPlaca[placa] / contagemPorPlaca[placa]).toFixed(2);
-      });
-
-      // Gráfico de Barras
-      if (chartBarras) chartBarras.destroy();
-      chartBarras = new Chart(document.getElementById('chartGastoPlaca'), {
-        type: 'bar',
-        data: {
-          labels: Object.keys(gastoPorPlaca),
-          datasets: [{
-            label: 'Gasto Total (R$)',
-            data: Object.values(gastoPorPlaca),
-            backgroundColor: '#2563eb'
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            datalabels: { display: false }
-          }
-        }
-      });
-
-      // Gráfico de Rosca com EXIBIÇÃO DE VALOR
-      if (chartRosca) chartRosca.destroy();
-      chartRosca = new Chart(document.getElementById('chartMediaRsKm'), {
-        type: 'doughnut',
-        data: {
-          labels: labelsPlacaRosca,
-          datasets: [{
-            label: 'Média R$/KM',
-            data: mediaRskm,
-            backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            datalabels: {
-              color: '#ffffff',
-              font: { weight: 'bold', size: 12 },
-              formatter: (value) => 'R$ ' + value
-            }
-          }
-        }
-      });
-    }
-
-    function renderizarTabela() {
-      const headersRow = document.getElementById('table-headers');
-      const body = document.getElementById('table-body');
-
-      headersRow.innerHTML = '';
-      body.innerHTML = '';
-
-      if (dadosFiltrados.length === 0) return;
-
-      const colunas = Object.keys(dadosFiltrados[0]);
-      colunas.forEach(col => {
-        const th = document.createElement('th');
-        th.innerText = col;
-        headersRow.appendChild(th);
-      });
-
-      dadosFiltrados.forEach(linha => {
-        const tr = document.createElement('tr');
-        colunas.forEach(col => {
-          const td = document.createElement('td');
-          td.innerText = linha[col] !== undefined ? linha[col] : '';
-          tr.appendChild(td);
-        });
-        body.appendChild(tr);
-      });
+      // Ativa a tela e o botão selecionado
+      document.getElementById(idAba).classList.add('active');
+      elementoBotao.classList.add('active');
     }
   </script>
+
 </body>
 </html>
