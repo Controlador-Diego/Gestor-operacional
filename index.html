@@ -5,21 +5,159 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Central de Dashboards</title>
   <style>
+    /* --- Reset e Base --- */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #0f172a; color: white; }
     
-    header { background: #1e293b; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-    h1 { font-size: 1.1rem; font-weight: 600; }
+    html, body { 
+      height: 100%; 
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+      background: #0f172a; 
+      color: #e2e8f0; 
+      overflow: hidden; /* Evita rolagem na página principal, apenas no iframe */
+    }
     
-    .nav-tabs { display: flex; gap: 8px; }
-    .tab-btn { background: #334155; color: #94a3b8; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
-    .tab-btn.active { background: #007bff; color: white; }
+    /* --- Header --- */
+    header { 
+      background: #1e293b; 
+      padding: 0 24px; 
+      height: 64px;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border-bottom: 1px solid #334155; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      position: relative;
+    }
     
-    main { flex: 1; position: relative; background: #f8fafc; }
-    .view-container { display: none; width: 100%; height: 100%; }
-    .view-container.active { display: block; }
+    h1 { 
+      font-size: 1.25rem; 
+      font-weight: 700; 
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     
-    iframe { width: 100%; height: 100%; border: none; }
+    /* --- Navegação (Abas) --- */
+    .nav-tabs { 
+      display: flex; 
+      gap: 6px; 
+      overflow-x: auto; /* Permite rolagem no celular */
+      scrollbar-width: none; /* Esconde scrollbar no Firefox */
+      -ms-overflow-style: none; /* Esconde scrollbar no IE/Edge */
+      padding: 8px 0;
+    }
+    .nav-tabs::-webkit-scrollbar { display: none; /* Esconde scrollbar no Chrome/Safari */ }
+
+    .tab-btn { 
+      background: transparent; 
+      color: #94a3b8; 
+      border: 1px solid transparent;
+      padding: 8px 20px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      font-weight: 600; 
+      transition: all 0.25s ease; 
+      white-space: nowrap;
+    }
+    
+    .tab-btn:hover { 
+      background: #334155; 
+      color: #f1f5f9; 
+    }
+    
+    .tab-btn.active { 
+      background: #2563eb; 
+      color: white; 
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      border-color: #3b82f6;
+    }
+    
+    /* --- Área Principal --- */
+    main { 
+      flex: 1; 
+      position: relative; 
+      background: #f1f5f9; 
+      height: calc(100vh - 64px);
+    }
+    
+    .view-container { 
+      display: none; 
+      width: 100%; 
+      height: 100%; 
+      position: relative;
+    }
+    
+    .view-container.active { 
+      display: block; 
+    }
+    
+    /* --- Iframe --- */
+    iframe { 
+      width: 100%; 
+      height: 100%; 
+      border: none; 
+      background: #ffffff;
+      opacity: 0; /* Começa invisível para transição suave */
+      transition: opacity 0.4s ease;
+    }
+    
+    iframe.loaded {
+      opacity: 1;
+    }
+
+    /* --- Loader (Spinner) --- */
+    .loader-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 5;
+      transition: opacity 0.3s ease;
+    }
+    
+    .loader-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loader-text {
+      margin-top: 16px;
+      color: #64748b;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* --- Responsividade --- */
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        height: auto;
+        padding: 12px 16px;
+        gap: 12px;
+      }
+      h1 { font-size: 1.1rem; }
+      main { height: calc(100vh - 100px); }
+    }
   </style>
 </head>
 <body>
@@ -27,38 +165,78 @@
   <header>
     <h1>📊 Central de Gerenciamento</h1>
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="carregarAba('dash1', 'https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec', this)">Painel 1</button>
-      <button class="tab-btn" onclick="carregarAba('dash2', 'https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec', this)">Painel 2</button>
+      <button class="tab-btn active" onclick="carregarAba('dash1', 'https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec', this)">Abastecimento</button>
+      <button class="tab-btn" onclick="carregarAba('dash2', 'https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec', this)">Ordem de serviço</button>
+      <button class="tab-btn" onclick="carregarAba('dash3', 'https://script.google.com/macros/s/AKfycbzjLdtCwTjHWfGAgmwm74e4OLkDWnoUU0d5D9Sc3ukqYhXwq5ZeNIT_w5oDqeJcnlgB0A/exec', this)">Controle de ponte</button>
     </div>
   </header>
 
   <main>
+    <!-- Painel 1 -->
     <div id="dash1" class="view-container active">
-      <iframe id="iframe-dash1" src="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec"></iframe>
+      <div class="loader-overlay" id="loader-dash1">
+        <div class="spinner"></div>
+        <span class="loader-text">Carregando Painel 1...</span>
+      </div>
+      <iframe id="iframe-dash1" src="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec" onload="esconderLoader('dash1')"></iframe>
     </div>
 
+    <!-- Painel 2 -->
     <div id="dash2" class="view-container">
-      <iframe id="iframe-dash2" src="about:blank"></iframe>
+      <div class="loader-overlay" id="loader-dash2">
+        <div class="spinner"></div>
+        <span class="loader-text">Carregando Painel 2...</span>
+      </div>
+      <iframe id="iframe-dash2" src="about:blank" onload="esconderLoader('dash2')"></iframe>
+    </div>
+
+    <!-- Painel 3 (NOVO) -->
+    <div id="dash3" class="view-container">
+      <div class="loader-overlay" id="loader-dash3">
+        <div class="spinner"></div>
+        <span class="loader-text">Carregando Painel 3...</span>
+      </div>
+      <iframe id="iframe-dash3" src="about:blank" onload="esconderLoader('dash3')"></iframe>
     </div>
   </main>
 
   <script>
     function carregarAba(idContainer, url, btn) {
-      // Oculta abas e inativa botões
+      // 1. Oculta todas as abas e inativa todos os botões
       document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-      // Ativa container e botão
+      // 2. Ativa o container e o botão clicado
       const container = document.getElementById(idContainer);
       container.classList.add('active');
       btn.classList.add('active');
 
-      // Carrega a URL no iframe apenas ao clicar
+      // 3. Lógica de carregamento sob demanda (Lazy Loading)
       const iframe = document.getElementById('iframe-' + idContainer);
-      if (iframe.src === 'about:blank' || iframe.src === '') {
+      const loader = document.getElementById('loader-' + idContainer);
+      
+      // Se ainda não foi carregado, define a URL e mostra o loader
+      if (iframe.src === 'about:blank' || iframe.src === window.location.href + 'about:blank') {
+        loader.classList.remove('hidden'); // Mostra o spinner
+        iframe.classList.remove('loaded'); // Garante que esteja invisível até carregar
         iframe.src = url;
       }
     }
+
+    function esconderLoader(idContainer) {
+      const loader = document.getElementById('loader-' + idContainer);
+      const iframe = document.getElementById('iframe-' + idContainer);
+      
+      if (loader) loader.classList.add('hidden');
+      if (iframe) iframe.classList.add('loaded');
+    }
+
+    // Garante que o loader do Painel 1 (que já carrega com a página) seja escondido ao terminar
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        esconderLoader('dash1');
+      }, 500); // Pequeno delay para garantir que o iframe interno do Google também renderizou
+    });
   </script>
 </body>
 </html>
