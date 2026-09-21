@@ -3,54 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Central de Painéis</title>
+  <title>Central de Dashboards</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #0f172a; color: white; }
     
-    .container { max-width: 800px; width: 100%; }
-    .header { text-align: center; margin-bottom: 40px; }
-    .header h1 { font-size: 2rem; margin-bottom: 8px; color: #fff; }
-    .header p { color: #94a3b8; font-size: 0.95rem; }
-
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    header { background: #1e293b; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+    h1 { font-size: 1.1rem; font-weight: 600; }
     
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s; }
-    .card:hover { border-color: #38bdf8; transform: translateY(-3px); }
+    .nav-tabs { display: flex; gap: 8px; }
+    .tab-btn { background: #334155; color: #94a3b8; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+    .tab-btn.active { background: #007bff; color: white; }
     
-    .card h2 { font-size: 1.25rem; color: #38bdf8; margin-bottom: 10px; }
-    .card p { font-size: 0.875rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px; }
+    main { flex: 1; position: relative; background: #f8fafc; }
+    .view-container { display: none; width: 100%; height: 100%; }
+    .view-container.active { display: block; }
     
-    .btn { display: inline-block; text-align: center; background: #0284c7; color: white; text-decoration: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
-    .btn:hover { background: #0369a1; }
+    iframe { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header">
-      <h1>🚀 Central de Gerenciamento</h1>
-      <p>Selecione o painel que deseja acessar</p>
+  <header>
+    <h1>📊 Central de Gerenciamento</h1>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="carregarAba('dash1', 'https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec', this)">Painel 1</button>
+      <button class="tab-btn" onclick="carregarAba('dash2', 'https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec', this)">Painel 2</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="dash1" class="view-container active">
+      <iframe id="iframe-dash1" src="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec"></iframe>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <div>
-          <h2>Painel 1</h2>
-          <p>Acesso ao primeiro sistema de monitoramento e relatórios do Apps Script.</p>
-        </div>
-        <a href="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec" target="_blank" class="btn">Abrir Painel 1 ↗</a>
-      </div>
-
-      <div class="card">
-        <div>
-          <h2>Painel 2 (Endereços)</h2>
-          <p>Acesso ao painel de gerenciamento de endereços, ocorrências e indicadores.</p>
-        </div>
-        <a href="https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec" target="_blank" class="btn">Abrir Painel 2 ↗</a>
-      </div>
+    <div id="dash2" class="view-container">
+      <iframe id="iframe-dash2" src="about:blank"></iframe>
     </div>
-  </div>
+  </main>
 
+  <script>
+    function carregarAba(idContainer, url, btn) {
+      // Oculta abas e inativa botões
+      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      // Ativa container e botão
+      const container = document.getElementById(idContainer);
+      container.classList.add('active');
+      btn.classList.add('active');
+
+      // Carrega a URL no iframe apenas ao clicar
+      const iframe = document.getElementById('iframe-' + idContainer);
+      if (iframe.src === 'about:blank' || iframe.src === '') {
+        iframe.src = url;
+      }
+    }
+  </script>
 </body>
 </html>
