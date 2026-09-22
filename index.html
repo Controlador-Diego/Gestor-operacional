@@ -6,28 +6,34 @@
   <title>Central de Dashboards</title>
   <style>
     /* --- Reset e Base --- */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
     
     html, body { 
       height: 100%; 
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
       background: #0f172a; 
       color: #e2e8f0; 
-      overflow: hidden; /* Evita rolagem na página principal, apenas no iframe */
+      overflow: hidden; 
+      display: flex;
+      flex-direction: column;
     }
     
     /* --- Header --- */
     header { 
       background: #1e293b; 
       padding: 0 24px; 
-      height: 64px;
+      min-height: 64px;
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
       border-bottom: 1px solid #334155; 
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       z-index: 10;
-      position: relative;
+      flex-shrink: 0;
     }
     
     h1 { 
@@ -43,18 +49,20 @@
     .nav-tabs { 
       display: flex; 
       gap: 6px; 
-      overflow-x: auto; /* Permite rolagem no celular */
-      scrollbar-width: none; /* Esconde scrollbar no Firefox */
-      -ms-overflow-style: none; /* Esconde scrollbar no IE/Edge */
+      overflow-x: auto; 
+      scrollbar-width: none; 
+      -ms-overflow-style: none; 
       padding: 8px 0;
     }
-    .nav-tabs::-webkit-scrollbar { display: none; /* Esconde scrollbar no Chrome/Safari */ }
+    .nav-tabs::-webkit-scrollbar { 
+      display: none; 
+    }
 
     .tab-btn { 
       background: transparent; 
       color: #94a3b8; 
       border: 1px solid transparent;
-      padding: 8px 20px; 
+      padding: 8px 16px; 
       border-radius: 8px; 
       cursor: pointer; 
       font-size: 0.9rem; 
@@ -70,7 +78,7 @@
     
     .tab-btn.active { 
       background: #2563eb; 
-      color: white; 
+      color: #ffffff; 
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
       border-color: #3b82f6;
     }
@@ -80,7 +88,8 @@
       flex: 1; 
       position: relative; 
       background: #f1f5f9; 
-      height: calc(100vh - 64px);
+      width: 100%;
+      height: 100%;
     }
     
     .view-container { 
@@ -100,7 +109,7 @@
       height: 100%; 
       border: none; 
       background: #ffffff;
-      opacity: 0; /* Começa invisível para transição suave */
+      opacity: 0; 
       transition: opacity 0.4s ease;
     }
     
@@ -111,7 +120,7 @@
     /* --- Loader (Spinner) --- */
     .loader-overlay {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      inset: 0;
       background: #f8fafc;
       display: flex;
       flex-direction: column;
@@ -151,12 +160,11 @@
     @media (max-width: 640px) {
       header {
         flex-direction: column;
-        height: auto;
         padding: 12px 16px;
         gap: 12px;
       }
       h1 { font-size: 1.1rem; }
-      main { height: calc(100vh - 100px); }
+      .nav-tabs { width: 100%; }
     }
   </style>
 </head>
@@ -164,61 +172,71 @@
 
   <header>
     <h1>📊 Central de Gerenciamento</h1>
-    <div class="nav-tabs">
+    <nav class="nav-tabs">
       <button class="tab-btn active" onclick="carregarAba('dash1', 'https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec', this)">Abastecimento</button>
       <button class="tab-btn" onclick="carregarAba('dash2', 'https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec', this)">Ordem de serviço</button>
       <button class="tab-btn" onclick="carregarAba('dash3', 'https://script.google.com/macros/s/AKfycbzjLdtCwTjHWfGAgmwm74e4OLkDWnoUU0d5D9Sc3ukqYhXwq5ZeNIT_w5oDqeJcnlgB0A/exec', this)">Controle de ponto</button>
-    </div>
+      <button class="tab-btn" onclick="carregarAba('dash4', 'https://script.google.com/macros/s/AKfycbxBh25gAKneY5wq9JnyWFynz91_pR_eVQG1EXGyl837tGhngfPVaJX4K0s8P51-sqegCg/exec', this)">Roteiro</button>
+    </nav>
   </header>
 
   <main>
-    <!-- Painel 1 -->
+    <!-- Painel 1: Abastecimento -->
     <div id="dash1" class="view-container active">
       <div class="loader-overlay" id="loader-dash1">
         <div class="spinner"></div>
-        <span class="loader-text">Carregando Painel 1...</span>
+        <span class="loader-text">Carregando Abastecimento...</span>
       </div>
       <iframe id="iframe-dash1" src="https://script.google.com/macros/s/AKfycbx-TooQFre7c2DizZNXrnIWE4OcvP1rnQc5aafSQK1zulvPM-o5miv--DJ9ZKKwaLcAuA/exec" onload="esconderLoader('dash1')"></iframe>
     </div>
 
-    <!-- Painel 2 -->
+    <!-- Painel 2: Ordem de Serviço -->
     <div id="dash2" class="view-container">
       <div class="loader-overlay" id="loader-dash2">
         <div class="spinner"></div>
-        <span class="loader-text">Carregando Painel 2...</span>
+        <span class="loader-text">Carregando Ordem de Serviço...</span>
       </div>
       <iframe id="iframe-dash2" src="about:blank" onload="esconderLoader('dash2')"></iframe>
     </div>
 
-    <!-- Painel 3 (NOVO) -->
+    <!-- Painel 3: Controle de Ponto -->
     <div id="dash3" class="view-container">
       <div class="loader-overlay" id="loader-dash3">
         <div class="spinner"></div>
-        <span class="loader-text">Carregando Painel 3...</span>
+        <span class="loader-text">Carregando Controle de Ponto...</span>
       </div>
       <iframe id="iframe-dash3" src="about:blank" onload="esconderLoader('dash3')"></iframe>
+    </div>
+
+    <!-- Painel 4: Roteiro -->
+    <div id="dash4" class="view-container">
+      <div class="loader-overlay" id="loader-dash4">
+        <div class="spinner"></div>
+        <span class="loader-text">Carregando Roteiro...</span>
+      </div>
+      <iframe id="iframe-dash4" src="about:blank" onload="esconderLoader('dash4')"></iframe>
     </div>
   </main>
 
   <script>
     function carregarAba(idContainer, url, btn) {
-      // 1. Oculta todas as abas e inativa todos os botões
+      // 1. Oculta todos os painéis e remove estado ativo dos botões
       document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-      // 2. Ativa o container e o botão clicado
+      // 2. Ativa o painel selecionado e seu botão correspondente
       const container = document.getElementById(idContainer);
       container.classList.add('active');
       btn.classList.add('active');
 
-      // 3. Lógica de carregamento sob demanda (Lazy Loading)
+      // 3. Lazy Loading do iframe
       const iframe = document.getElementById('iframe-' + idContainer);
       const loader = document.getElementById('loader-' + idContainer);
       
-      // Se ainda não foi carregado, define a URL e mostra o loader
-      if (iframe.src === 'about:blank' || iframe.src === window.location.href + 'about:blank') {
-        loader.classList.remove('hidden'); // Mostra o spinner
-        iframe.classList.remove('loaded'); // Garante que esteja invisível até carregar
+      const currentSrc = iframe.getAttribute('src');
+      if (!currentSrc || currentSrc === 'about:blank') {
+        if (loader) loader.classList.remove('hidden');
+        iframe.classList.remove('loaded');
         iframe.src = url;
       }
     }
@@ -231,11 +249,11 @@
       if (iframe) iframe.classList.add('loaded');
     }
 
-    // Garante que o loader do Painel 1 (que já carrega com a página) seja escondido ao terminar
+    // Esconde o loader inicial da primeira aba após o carregamento
     window.addEventListener('load', () => {
       setTimeout(() => {
         esconderLoader('dash1');
-      }, 500); // Pequeno delay para garantir que o iframe interno do Google também renderizou
+      }, 500);
     });
   </script>
 </body>
