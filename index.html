@@ -6,99 +6,191 @@
   <title>Central de Dashboards</title>
   <style>
     /* --- Reset e Base --- */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
     
     html, body { 
-      height: 100%; width: 100%;
+      height: 100%; 
+      width: 100%;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-      background: #0f172a; color: #e2e8f0; 
-      overflow: hidden; display: flex; flex-direction: column;
+      background: #0f172a; 
+      color: #e2e8f0; 
+      overflow: hidden; 
+      display: flex;
+      flex-direction: column;
     }
     
     /* --- Header --- */
     header { 
       background: #1e293b; 
       padding: clamp(10px, 2vh, 16px) clamp(12px, 3vw, 24px); 
-      display: flex; justify-content: space-between; align-items: center; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
       border-bottom: 1px solid #334155; 
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      z-index: 10; flex-shrink: 0; gap: 12px;
+      z-index: 10;
+      flex-shrink: 0;
+      gap: 12px;
       padding-top: max(10px, env(safe-area-inset-top));
       padding-left: max(12px, env(safe-area-inset-left));
       padding-right: max(12px, env(safe-area-inset-right));
     }
     
     h1 { 
-      font-size: clamp(1rem, 4vw, 1.25rem); font-weight: 700; color: #f8fafc;
-      display: flex; align-items: center; gap: 8px; white-space: nowrap;
+      font-size: clamp(1rem, 4vw, 1.25rem); 
+      font-weight: 700; 
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
     }
     
     /* --- Navegação (Abas) --- */
     .nav-tabs { 
-      display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; 
-      -ms-overflow-style: none; -webkit-overflow-scrolling: touch;
-      padding: 4px 0; max-width: 100%;
+      display: flex; 
+      gap: 8px; 
+      overflow-x: auto; 
+      scrollbar-width: none; 
+      -ms-overflow-style: none; 
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 0;
+      max-width: 100%;
     }
-    .nav-tabs::-webkit-scrollbar { display: none; }
+    .nav-tabs::-webkit-scrollbar { 
+      display: none; 
+    }
 
     .tab-btn { 
-      background: transparent; color: #94a3b8; border: 1px solid transparent;
-      padding: 10px 16px; min-height: 44px; border-radius: 8px; cursor: pointer; 
-      font-size: 0.875rem; font-weight: 600; transition: all 0.25s ease; 
-      white-space: nowrap; display: inline-flex; align-items: center; flex-shrink: 0;
+      background: transparent; 
+      color: #94a3b8; 
+      border: 1px solid transparent;
+      padding: 10px 16px; 
+      min-height: 44px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 0.875rem; 
+      font-weight: 600; 
+      transition: all 0.25s ease; 
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
     
-    .tab-btn:hover { background: #334155; color: #f1f5f9; }
+    .tab-btn:hover { 
+      background: #334155; 
+      color: #f1f5f9; 
+    }
     
     .tab-btn.active { 
-      background: #2563eb; color: #ffffff; 
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); border-color: #3b82f6;
+      background: #2563eb; 
+      color: #ffffff; 
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      border-color: #3b82f6;
     }
     
     /* --- Área Principal --- */
     main { 
-      flex: 1; position: relative; background: #f1f5f9; width: 100%; height: 100%;
+      flex: 1; 
+      position: relative; 
+      background: #f1f5f9; 
+      width: 100%;
+      height: 100%;
     }
     
     .view-container { 
-      display: none; width: 100%; height: 100%; position: relative;
+      display: none; 
+      width: 100%; 
+      height: 100%; 
+      position: relative;
     }
     
-    .view-container.active { display: block; }
+    .view-container.active { 
+      display: block; 
+    }
     
     /* --- Iframe --- */
     iframe { 
-      width: 100%; height: 100%; border: none; background: #ffffff;
-      opacity: 0; /* Começa invisível para a transição */
+      width: 100%; 
+      height: 100%; 
+      border: none; 
+      background: #ffffff;
+      opacity: 0; 
       transition: opacity 0.4s ease;
     }
     
-    iframe.loaded { opacity: 1; } /* Torna visível quando carregado */
+    iframe.loaded {
+      opacity: 1;
+    }
 
     /* --- Loader (Spinner) --- */
     .loader-overlay {
-      position: absolute; inset: 0; background: #f8fafc;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      z-index: 5; transition: opacity 0.3s ease; padding: 16px; text-align: center;
+      position: absolute;
+      inset: 0;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 5;
+      transition: opacity 0.3s ease;
+      padding: 16px;
+      text-align: center;
     }
     
-    .loader-overlay.hidden { opacity: 0; pointer-events: none; }
-
-    .spinner {
-      width: 40px; height: 40px; border: 4px solid #e2e8f0;
-      border-top: 4px solid #2563eb; border-radius: 50%; animation: spin 1s linear infinite;
+    .loader-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .loader-text { margin-top: 16px; color: #64748b; font-size: 0.9rem; font-weight: 500; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
 
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loader-text {
+      margin-top: 16px;
+      color: #64748b;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
 
-    /* --- Responsividade Mobile --- */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* --- Responsividade Mobile (Telas pequenas) --- */
     @media (max-width: 640px) {
-      header { flex-direction: column; align-items: stretch; padding-bottom: 8px; }
-      h1 { justify-content: center; }
-      .nav-tabs { width: 100%; justify-content: flex-start; }
-      .tab-btn { padding: 8px 14px; font-size: 0.85rem; }
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        padding-bottom: 8px;
+      }
+
+      h1 { 
+        justify-content: center;
+      }
+
+      .nav-tabs { 
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .tab-btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
@@ -107,16 +199,19 @@
   <header>
     <h1>📊 Central de Gerenciamento</h1>
     <nav class="nav-tabs">
-      <!-- Abas: Note que Roteiro está com a classe 'active' por padrão -->
-      <button class="tab-btn" onclick="carregarAba('dash1', 'https://script.google.com/macros/s/AKfycbzdF-4C2magvZ4HE_CPIYZ3KD43bSEJ5Pa3ndcDvDnr/exec', this)">Abastecimento</button>
+      <!-- Abastecimento -->
+      <button class="tab-btn" onclick="carregarAba('dash1', 'https://script.google.com/macros/s/AKfycbwfPkggg0d7xsvoAVm83f_hyv8OKLKR9ASu8iXObOScq3-gAEwULvmmJ1jrzLjmodx-6A/exec', this)">Abastecimento</button>
+      <!-- Ordem de serviço -->
       <button class="tab-btn" onclick="carregarAba('dash2', 'https://script.google.com/macros/s/AKfycbxDZysCb69Tr6XbG1gG3fplih8rDjZ3YfZ32moZUBxdkVeIdH4QL9vuGZ2lc1l3OY_L/exec', this)">Ordem de serviço</button>
+      <!-- Controle de ponto -->
       <button class="tab-btn" onclick="carregarAba('dash3', 'https://script.google.com/macros/s/AKfycbzjLdtCwTjHWfGAgmwm74e4OLkDWnoUU0d5D9Sc3ukqYhXwq5ZeNIT_w5oDqeJcnlgB0A/exec', this)">Controle de ponto</button>
-      <button class="tab-btn active" onclick="carregarAba('dash4', 'URL_DO_SEU_SCRIPT_ROTEIRO_AQUI', this)">Roteiro</button>
+      <!-- Roteiro (Agora é a aba ativa por padrão) -->
+      <button class="tab-btn active" onclick="carregarAba('dash4', 'https://script.google.com/macros/s/AKfycbxBh25gAKneY5wq9JnyWFynz91_pR_eVQG1EXGyl837tGhngfPVaJX4K0s8P51-sqegCg/exec', this)">Roteiro</button>
     </nav>
   </header>
 
   <main>
-    <!-- Painel 1: Abastecimento (Carregamento sob demanda) -->
+    <!-- Painel 1: Abastecimento -->
     <div id="dash1" class="view-container">
       <div class="loader-overlay" id="loader-dash1">
         <div class="spinner"></div>
@@ -149,43 +244,38 @@
         <div class="spinner"></div>
         <span class="loader-text">Carregando Roteiro...</span>
       </div>
-      <!-- O src já começa com a URL para carregar imediatamente -->
-      <iframe id="iframe-dash4" src="URL_DO_SEU_SCRIPT_ROTEIRO_AQUI" onload="esconderLoader('dash4')"></iframe>
+      <!-- URL direta já no src para carregar imediatamente -->
+      <iframe id="iframe-dash4" src="https://script.google.com/macros/s/AKfycbxBh25gAKneY5wq9JnyWFynz91_pR_eVQG1EXGyl837tGhngfPVaJX4K0s8P51-sqegCg/exec" onload="esconderLoader('dash4')"></iframe>
     </div>
   </main>
 
   <script>
     function carregarAba(idContainer, url, btn) {
-      // 1. Reseta todas as abas e botões
+      // 1. Oculta todos os painéis e remove estado ativo dos botões
       document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-      // 2. Ativa a aba e o botão clicado
+      // 2. Ativa o painel selecionado e seu botão correspondente
       const container = document.getElementById(idContainer);
       container.classList.add('active');
       btn.classList.add('active');
+
+      // Centraliza suavemente a aba clicada na barra de rolagem (mobile)
       btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
-      // 3. Lógica do Iframe
+      // 3. Lazy Loading do iframe
       const iframe = document.getElementById('iframe-' + idContainer);
       const loader = document.getElementById('loader-' + idContainer);
       
-      // Se o iframe já tiver a URL correta, apenas garante que o loader sumiu (previne bug de tela branca)
-      if (iframe.src === url || (iframe.src !== 'about:blank' && iframe.src.includes('exec'))) {
+      const currentSrc = iframe.getAttribute('src');
+      if (!currentSrc || currentSrc === 'about:blank') {
+        if (loader) loader.classList.remove('hidden');
+        iframe.classList.remove('loaded');
+        iframe.src = url;
+      } else {
+        // Se já foi carregado antes, apenas garante que o loader suma (previne tela branca)
         esconderLoader(idContainer);
-        return;
       }
-
-      // Se for a primeira vez, mostra o loader e carrega
-      if (loader) loader.classList.remove('hidden');
-      iframe.classList.remove('loaded');
-      iframe.src = url;
-
-      // 4. PLANO B (Fallback): Se o evento 'onload' do Google falhar (comum em mobile),
-      // força a exibição do conteúdo após 2.5 segundos para não travar a tela.
-      setTimeout(() => {
-        esconderLoader(idContainer);
-      }, 2500);
     }
 
     function esconderLoader(idContainer) {
@@ -196,12 +286,12 @@
       if (iframe) iframe.classList.add('loaded');
     }
 
-    // Inicialização robusta para a aba padrão (Roteiro)
+    // CORREÇÃO DO BUG "TER QUE PASSAR O DEDO":
+    // Força a exibição da tela inicial após 2.5 segundos, caso o evento 'onload' do Google falhe.
     window.addEventListener('load', () => {
-      // Garante que o loader da aba inicial suma, mesmo que o onload do iframe tenha falhado
       setTimeout(() => {
         esconderLoader('dash4');
-      }, 1500);
+      }, 2500);
     });
   </script>
 </body>
