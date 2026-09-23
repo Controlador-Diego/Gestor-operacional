@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Central de Dashboards</title>
   <style>
     /* --- Reset e Base --- */
@@ -14,6 +14,7 @@
     
     html, body { 
       height: 100%; 
+      width: 100%;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
       background: #0f172a; 
       color: #e2e8f0; 
@@ -25,8 +26,7 @@
     /* --- Header --- */
     header { 
       background: #1e293b; 
-      padding: 0 24px; 
-      min-height: 64px;
+      padding: clamp(10px, 2vh, 16px) clamp(12px, 3vw, 24px); 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
@@ -34,25 +34,33 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       z-index: 10;
       flex-shrink: 0;
+      gap: 12px;
+      /* Respeita safe area de aparelhos com notch */
+      padding-top: max(10px, env(safe-area-inset-top));
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
     }
     
     h1 { 
-      font-size: 1.25rem; 
+      font-size: clamp(1rem, 4vw, 1.25rem); 
       font-weight: 700; 
       color: #f8fafc;
       display: flex;
       align-items: center;
       gap: 8px;
+      white-space: nowrap;
     }
     
     /* --- Navegação (Abas) --- */
     .nav-tabs { 
       display: flex; 
-      gap: 6px; 
+      gap: 8px; 
       overflow-x: auto; 
       scrollbar-width: none; 
       -ms-overflow-style: none; 
-      padding: 8px 0;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 0;
+      max-width: 100%;
     }
     .nav-tabs::-webkit-scrollbar { 
       display: none; 
@@ -62,13 +70,18 @@
       background: transparent; 
       color: #94a3b8; 
       border: 1px solid transparent;
-      padding: 8px 16px; 
+      padding: 10px 16px; 
+      min-height: 44px; /* Tamanho mínimo de toque recomendado (Apple/Google) */
       border-radius: 8px; 
       cursor: pointer; 
-      font-size: 0.9rem; 
+      font-size: 0.875rem; 
       font-weight: 600; 
       transition: all 0.25s ease; 
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
     
     .tab-btn:hover { 
@@ -128,6 +141,8 @@
       align-items: center;
       z-index: 5;
       transition: opacity 0.3s ease;
+      padding: 16px;
+      text-align: center;
     }
     
     .loader-overlay.hidden {
@@ -156,15 +171,27 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* --- Responsividade --- */
+    /* --- Responsividade Mobile (Telas pequenas) --- */
     @media (max-width: 640px) {
       header {
         flex-direction: column;
-        padding: 12px 16px;
-        gap: 12px;
+        align-items: stretch;
+        padding-bottom: 8px;
       }
-      h1 { font-size: 1.1rem; }
-      .nav-tabs { width: 100%; }
+
+      h1 { 
+        justify-content: center;
+      }
+
+      .nav-tabs { 
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .tab-btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
@@ -228,6 +255,9 @@
       const container = document.getElementById(idContainer);
       container.classList.add('active');
       btn.classList.add('active');
+
+      // Centraliza suavemente a aba clicada na barra de rolagem (mobile)
+      btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
       // 3. Lazy Loading do iframe
       const iframe = document.getElementById('iframe-' + idContainer);
